@@ -1,0 +1,69 @@
+server:
+  port: 9090
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cloud:
+    gateway:
+      # CORS is handled in CorsConfig.java (a CorsWebFilter bean with order -2)
+      # NOT here via globalcors — because YAML-based CORS only applies to
+      # requests that reach the normal filter chain. Our JWT filter's reject()
+      # method short-circuits the chain, so YAML CORS headers never get added
+      # to 401/403 responses. The browser then sees a CORS error instead of
+      # an auth error, making frontend debugging very confusing.
+      # CorsWebFilter runs BEFORE the JWT filter and wraps the entire chain,
+      # guaranteeing CORS headers on every response including rejected ones.
+      routes:
+
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
+        - id: resident-service
+          uri: lb://resident-service
+          predicates:
+            - Path=/residents/**,/join-requests/**
+
+        - id: maintenance-service
+          uri: lb://maintenance-service
+          predicates:
+            - Path=/maintenance/**
+
+        - id: expense-service
+          uri: lb://expense-service
+          predicates:
+            - Path=/expenses/**
+
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/payments/**
+
+        - id: complaint-service
+          uri: lb://complaint-service
+          predicates:
+            - Path=/complaints/**
+
+        - id: notice-service
+          uri: lb://notice-service
+          predicates:
+            - Path=/notices/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+jwt:
+  secret: ${JWT_SECRET}
+
+# Allowed frontend origins — add production URL here before deploying
+cors:
+  allowed-origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"

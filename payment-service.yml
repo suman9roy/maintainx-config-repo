@@ -1,0 +1,49 @@
+server:
+  port: 8085
+
+spring:
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/maintainx_payment
+    username: postgres
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: false
+
+
+    bootstrap-servers: localhost:9092
+
+    producer:
+
+      key-serializer:
+        org.apache.kafka.common.serialization.StringSerializer
+
+      value-serializer:
+        org.springframework.kafka.support.serializer.JsonSerializer
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      # Use Spring's JsonSerializer to serialize events to JSON
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: payment-service-group
+      auto-offset-reset: earliest
+      # Use Spring's JsonDeserializer to deserialize JSON messages to domain objects
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+razorpay:
+  key: ${RAZORPAY_KEY}
+  secret: ${RAZORPAY_SECRET}
+bill-sync:
+    retry-interval-ms: 300000
