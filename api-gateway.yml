@@ -2,10 +2,6 @@ server:
   port: 9090
 
 spring:
-    redis:
-      host: localhost
-      port: 6379
-
   cloud:
     gateway:
       # CORS is handled in CorsConfig.java (a CorsWebFilter bean with order -2)
