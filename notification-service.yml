@@ -4,7 +4,7 @@ server:
 spring:
   kafka:
     consumer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
       group-id: notification-group
       auto-offset-reset: earliest
       # Use Spring's JsonDeserializer to deserialize JSON messages to domain objects
