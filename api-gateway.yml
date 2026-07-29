@@ -17,7 +17,7 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/auth/**,/super-admin**,/apartments/**
+            - Path=/auth/**,/super-admin/**,/apartments/**
 
         - id: resident-service
           uri: lb://resident-service
