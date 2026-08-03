@@ -48,7 +48,10 @@ spring:
           uri: lb://notice-service
           predicates:
             - Path=/notices/**
-
+        - id: aichat-service
+          uri: lb://aichat-service
+          predicates:
+            - Path=/api/ai/**
 eureka:
   client:
     service-url:
