@@ -26,11 +26,7 @@ spring:
           top-p: 0.9
       embedding:
         model: ${SPRING_AI_OLLAMA_EMBEDDING_MODEL_NAME:nomic-embed-text}
-    openai:
-      api-key: ${OPENAI_API_KEY:}
-      chat:
-        options:
-          model: ${OPENAI_MODEL:gpt-4o-mini}
+    
 
 eureka:
   client:
