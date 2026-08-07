@@ -2,65 +2,114 @@ server:
   port: ${SERVER_PORT:8090}
 
 spring:
+  application:
+    name: aichat-service
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 25MB
+
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/maintainx_ai}
     username: ${DB_USERNAME:maintainx}
     password: ${DB_PASSWORD:maintainx}
+
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
+
   flyway:
     enabled: true
     locations: classpath:db/migration
+
   ai:
     ollama:
       base-url: ${SPRING_AI_OLLAMA_BASE_URL:http://localhost:11434}
+
       chat:
-        model: ${SPRING_AI_OLLAMA_CHAT_MODEL_NAME:qwen2:1.7b}
+        model: ${SPRING_AI_OLLAMA_CHAT_MODEL_NAME:qwen2.5:3b}
         options:
           temperature: 0.7
           top-p: 0.9
+
       embedding:
         model: ${SPRING_AI_OLLAMA_EMBEDDING_MODEL_NAME:nomic-embed-text}
-    
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+    consumer:
+      group-id: ai-chat-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      properties:
+        spring.json.trusted.packages: "*"
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
 
-
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus
+
   endpoint:
     health:
       show-details: when-authorized
       probes:
         enabled: true
+
   health:
     livenessstate:
       enabled: true
     readinessstate:
       enabled: true
 
-
 maintainx:
-  ai-platform:
-    guardrails:
-      enabled: true
-      allowed-domain: apartment-management
+
+  storage:
+    local:
+      root-directory: ./documents
+
+  kafka:
+    topics:
+      document-uploaded: document-uploaded-topic
+      document-processed: document-processed-topic
+      document-failed: document-failed-topic
+
+  ai:
+
+    rag:
+      chunk-size: 1000
+      chunk-overlap: 200
+
+    retrieval:
+      top-k: 5
+
+    prompt:
+      max-context-chunks: 5
 
 logging:
   level:
     root: INFO
-    com.maintainx.aiplatform: DEBUG
+    com.maintainx.aichat_service: DEBUG
+    org.springframework.ai: INFO
     org.springframework.web: INFO
 
 ---
