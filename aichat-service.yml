@@ -82,11 +82,12 @@ management:
       enabled: true
 
 maintainx:
-
-  storage:
-    local:
-      root-directory: ./documents
-
+  ai:
+    storage:
+      location: ./documents
+      allowed-extensions:
+        - pdf
+      max-file-size: 20971520   # 20 MB, matches spring.servlet.multipart.max-file-size
   kafka:
     topics:
       document-uploaded: document-uploaded-topic
